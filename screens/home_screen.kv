@@ -1,0 +1,153 @@
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+
+        # 1. Header section
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: self.minimum_height
+            padding: 10
+            spacing: 5
+            Label:
+                text: "मुख्य पृष्ठ"  # Main Header in Nepali
+                font_size: 28
+                bold: True
+                halign: 'center'
+                size_hint_y: None
+                height: self.texture_size[1]
+            Label:
+                text: "आर्थिक सारांश"  # Subheader: Financial Summary
+                font_size: 18
+                halign: 'center'
+                size_hint_y: None
+                height: self.texture_size[1]
+
+        # 2. Month chooser with stepper and calendar button
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            spacing: 10
+            padding: 5
+
+            Button:
+                text: "←"
+                size_hint_x: None
+                width: 50
+                on_release: root.on_month_decrement()
+
+            Label:
+                id: month_label
+                text: root.current_month_text
+                font_size: 20
+                halign: 'center'
+                valign: 'middle'
+                size_hint_x: 1
+
+            Button:
+                size_hint_x: None
+                width: 50
+                background_normal: ''
+                background_color: (0.2, 0.6, 0.9, 1)
+                on_release: root.open_calendar()
+                Image:
+                    source: 'assets/calendar_icon.png'  # Update path if needed
+                    center_x: self.parent.center_x
+                    center_y: self.parent.center_y
+
+            Button:
+                text: "→"
+                size_hint_x: None
+                width: 50
+                on_release: root.on_month_increment()
+
+        # 3. Summary box with income and expense buttons
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: None
+            height: 200
+            padding: 15
+            spacing: 10
+            canvas.before:
+                Color:
+                    rgba: (0.9, 0.9, 0.9, 1)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [15]
+
+            Label:
+                id: total_amount
+                text: "कुल रकम: रु ०"
+                font_size: 22
+                size_hint_y: None
+                height: self.texture_size[1]
+                halign: 'center'
+
+            BoxLayout:
+                spacing: 20
+
+                Button:
+                    id: income_btn
+                    text: "आम्दानी +"
+                    font_size: 20
+                    on_release: root.open_income_form()
+                Button:
+                    id: expense_btn
+                    text: "खर्च +"
+                    font_size: 20
+                    on_release: root.open_expense_form()
+
+            Label:
+                id: net_result
+                text: "शुद्ध नतिजा: रु ०"
+                font_size: 18
+                size_hint_y: None
+                height: self.texture_size[1]
+                halign: 'center'
+
+        # 4. Add Member Button
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            padding: 5
+
+            Button:
+                text: "सदस्य थप्नुहोस्"
+                font_size: 20
+                on_release: root.open_add_member_form()
+
+        # 5. Transaction summary with filter buttons and list
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+
+            BoxLayout:
+                size_hint_y: None
+                height: 40
+                spacing: 10
+
+                Button:
+                    text: "आज"
+                    on_release: root.filter_transactions('today')
+                Button:
+                    text: "यो हप्ता"
+                    on_release: root.filter_transactions('week')
+                Button:
+                    text: "आम्दानी"
+                    on_release: root.filter_transactions('income')
+                Button:
+                    text: "खर्च"
+                    on_release: root.filter_transactions('expense')
+
+            ScrollView:
+                do_scroll_x: False
+
+                GridLayout:
+                    id: transaction_list
+                    cols: 1
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: 5

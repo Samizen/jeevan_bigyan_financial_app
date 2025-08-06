@@ -1,0 +1,94 @@
+#:import Color kivy.utils.get_color_from_hex
+
+BoxLayout:
+    canvas.before:
+        Color:
+            rgba: Color("#1e1e1e")  # dark gray background
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    orientation: 'vertical'
+    
+    ScreenManager:
+        id: screen_manager
+        size_hint_y: 0.9  # take 90% of height
+
+        HomeScreen:
+            name: 'home'
+        MembersScreen:
+            name: 'members'
+        ReportsScreen:
+            name: 'reports'
+        CalculatorScreen:
+            name: 'calculator'
+        SettingsScreen:
+            name: 'settings'
+
+    BoxLayout:
+        size_hint_y: 0.1  # bottom 10% for nav buttons
+        spacing: 5
+        padding: 5
+
+        Button:
+            text: 'Home'
+            on_release: screen_manager.current = 'home'
+        Button:
+            text: 'Members'
+            on_release: screen_manager.current = 'members'
+        Button:
+            text: 'Reports'
+            on_release: screen_manager.current = 'reports'
+        Button:
+            text: 'Calculator'
+            on_release: screen_manager.current = 'calculator'
+        Button:
+            text: 'Settings'
+            on_release: screen_manager.current = 'settings'
+
+
+<Label>:
+    font_name: 'Yantramanav'
+
+<Button>:
+    font_name: 'Yantramanav'
+
+<TextInput>:
+    font_name: 'Yantramanav'
+
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Home Page"
+            font_size: 32
+            color: 1,1,1,1
+            bold: True
+
+<MembersScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Members Page"
+            font_size: 32
+
+<ReportsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Reports Page"
+            font_size: 32
+
+<CalculatorScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Calculator Page"
+            font_size: 32
+
+<SettingsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Settings (Placeholder)"
+            font_size: 32

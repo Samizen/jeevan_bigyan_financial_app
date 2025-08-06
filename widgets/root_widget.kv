@@ -1,0 +1,46 @@
+#:import HomeScreen screens.home_screen.HomeScreen
+#:import MembersScreen screens.members_screen.MembersScreen
+#:import ReportsScreen screens.reports_screen.ReportsScreen
+#:import CalculatorScreen screens.calculator_screen.CalculatorScreen
+#:import SettingsScreen screens.settings_screen.SettingsScreen
+
+<RootWidget>:
+    orientation: 'vertical'
+
+    ScreenManager:
+        id: screen_manager
+        # We'll assign this to RootWidget.screen_manager property automatically
+        on_kv_post:
+            root.screen_manager = self
+
+        HomeScreen:
+            name: 'home'
+        MembersScreen:
+            name: 'members'
+        ReportsScreen:
+            name: 'reports'
+        CalculatorScreen:
+            name: 'calculator'
+        SettingsScreen:
+            name: 'settings'
+
+    BoxLayout:
+        size_hint_y: 0.1
+        spacing: 5
+        padding: 5
+
+        Button:
+            text: "मुख्य पृष्ठ"
+            on_release: root.switch_screen('home')
+        Button:
+            text: "सदस्यहरू"
+            on_release: root.switch_screen('members')
+        Button:
+            text: "रिपोर्टहरू"
+            on_release: root.switch_screen('reports')
+        Button:
+            text: "क्याल्कुलेटर"
+            on_release: root.switch_screen('calculator')
+        Button:
+            text: "सेटिङ"
+            on_release: root.switch_screen('settings')
