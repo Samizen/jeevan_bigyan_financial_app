@@ -6,8 +6,15 @@ Config.set('graphics', 'resizable', '0')
 from kivy.app import App
 from kivy.lang import Builder
 
-# Load root_widget kv explicitly
+# Load root_widget kv explicitly for bottom navigation bar
 Builder.load_file('widgets/root_widget.kv')
+
+# Load all screen kv files
+Builder.load_file('screens/home_screen.kv')
+Builder.load_file('screens/members_screen.kv')
+Builder.load_file('screens/reports_screen.kv')
+Builder.load_file('screens/calculator_screen.kv')
+Builder.load_file('screens/settings_screen.kv')
 
 from widgets.root_widget import RootWidget
 
@@ -27,7 +34,7 @@ LabelBase.register(
 
 class FinanceApp(App):
     def build(self):
-        return RootWidget()
+        return Builder.load_file('financeapp.kv')
 
 if __name__ == '__main__':
     FinanceApp().run()
