@@ -1,0 +1,96 @@
+<TransactionFormPopup>:
+    title: "लेनदेन थप्नुहोस्"
+    size_hint: 0.9, 0.9
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+
+        # 🔘 Transaction Type Toggle
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            spacing: 10
+            ToggleButton:
+                id: income_toggle
+                text: "आम्दानी"
+                group: "transaction_type"
+                state: "down" if root.default_type == "income" else "normal"
+                on_state: if self.state == "down": root.set_type("income")
+            ToggleButton:
+                id: expense_toggle
+                text: "खर्च"
+                group: "transaction_type"
+                state: "down" if root.default_type == "expense" else "normal"
+                on_state: if self.state == "down": root.set_type("expense")
+
+        # 🔢 Amount Input with Label
+        Label:
+            text: "रकम:"
+            size_hint_y: None
+            height: 30
+        TextInput:
+            id: amount_input
+            hint_text: "रकम प्रविष्ट गर्नुहोस्"
+            input_filter: 'float'
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        # 🔘 Category Selection (dynamically filled from Python)
+        Label:
+            text: "श्रेणी छान्नुहोस्:"
+            size_hint_y: None
+            height: 30
+        GridLayout:
+            id: category_radio_group
+            cols: 2
+            size_hint_y: None
+            height: self.minimum_height
+            spacing: 5
+
+        # ➕ Add Category Button
+        Button:
+            text: "श्रेणी थप्नुहोस्"
+            size_hint_y: None
+            height: 40
+            on_release: root.open_add_category_popup()
+
+        # 👤 Member Selection Input
+        Label:
+            text: "सदस्य छान्नुहोस्:"
+            size_hint_y: None
+            height: 30
+        TextInput:
+            id: member_input
+            hint_text: "सदस्य नाम टाइप गर्नुहोस्"
+            multiline: False
+            size_hint_y: None
+            height: 40
+            on_text: root.update_member_suggestions(self.text)
+
+        # 📅 Date Input
+        Label:
+            text: "मिति (वि.सं.):"
+            size_hint_y: None
+            height: 30
+        TextInput:
+            id: date_input
+            hint_text: "मिति प्रविष्ट गर्नुहोस्"
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        # ✅ Buttons (Confirm / Cancel)
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            spacing: 10
+            Button:
+                text: "रद्द गर्नुहोस्"
+                on_release: root.dismiss()
+            Button:
+                text: "पुष्टि गर्नुहोस्"
+                on_release: root.submit_transaction()

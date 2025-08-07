@@ -91,14 +91,16 @@
 
                 Button:
                     id: income_btn
-                    text: "आम्दानी +"
+                    text: root.income_button_text
+                    on_press: root.open_add_income_form()
                     font_size: 20
-                    on_release: root.open_income_form()
+                    # on_release: root.open_income_form()
                 Button:
                     id: expense_btn
-                    text: "खर्च +"
+                    text: root.expense_button_text
+                    on_press: root.open_add_expense_form()
                     font_size: 20
-                    on_release: root.open_expense_form()
+                    # on_release: root.open_expense_form()
 
             Label:
                 id: net_result
@@ -151,4 +153,3 @@
                     size_hint_y: None
                     height: self.minimum_height
                     spacing: 5
-</HomeScreen>

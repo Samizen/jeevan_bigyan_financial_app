@@ -15,6 +15,7 @@ Builder.load_file('screens/members_screen.kv')
 Builder.load_file('screens/reports_screen.kv')
 Builder.load_file('screens/calculator_screen.kv')
 Builder.load_file('screens/settings_screen.kv')
+Builder.load_file('widgets/transactions_form.kv')
 
 from widgets.root_widget import RootWidget
 
