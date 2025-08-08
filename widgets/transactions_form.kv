@@ -3,11 +3,13 @@
     size_hint: 0.9, 0.9
     auto_dismiss: False
 
+    # This BoxLayout is the *single* root widget for the Popup's content
     BoxLayout:
         orientation: 'vertical'
         padding: 10
         spacing: 10
 
+        # All other widgets must be children of this BoxLayout
         # 🔘 Transaction Type Toggle
         BoxLayout:
             size_hint_y: None
@@ -18,15 +20,15 @@
                 text: "आम्दानी"
                 group: "transaction_type"
                 state: "down" if root.default_type == "income" else "normal"
-                on_state: if self.state == "down": root.set_type("income")
+                on_state: if self.state == "down": root.set_type("Income")
             ToggleButton:
                 id: expense_toggle
                 text: "खर्च"
                 group: "transaction_type"
                 state: "down" if root.default_type == "expense" else "normal"
-                on_state: if self.state == "down": root.set_type("expense")
+                on_state: if self.state == "down": root.set_type("Expense")
 
-        # 🔢 Amount Input with Label
+        # 🔢 Amount Input
         Label:
             text: "रकम:"
             size_hint_y: None
@@ -39,7 +41,7 @@
             size_hint_y: None
             height: 40
 
-        # 🔘 Category Selection (dynamically filled from Python)
+        # 🔘 Category Selection
         Label:
             text: "श्रेणी छान्नुहोस्:"
             size_hint_y: None
@@ -51,7 +53,6 @@
             height: self.minimum_height
             spacing: 5
 
-        # ➕ Add Category Button
         Button:
             text: "श्रेणी थप्नुहोस्"
             size_hint_y: None
@@ -83,7 +84,19 @@
             size_hint_y: None
             height: 40
 
-        # ✅ Buttons (Confirm / Cancel)
+        # 📝 Description Input (NEW)
+        Label:
+            text: "विवरण:"
+            size_hint_y: None
+            height: 30
+        TextInput:
+            id: description_input
+            hint_text: "विवरण लेख्नुहोस्"
+            multiline: False
+            size_hint_y: None
+            height: 40    
+
+        # ✅ Buttons
         BoxLayout:
             size_hint_y: None
             height: 50

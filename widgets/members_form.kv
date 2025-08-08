@@ -1,0 +1,46 @@
+<MembersFormPopup>:
+    title: "नयाँ सदस्य थप्नुहोस्"
+    size_hint: 0.8, 0.4
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 15
+        spacing: 15
+        
+        Label:
+            text: "सदस्यको नाम प्रविष्ट गर्नुहोस्:"
+            size_hint_y: None
+            height: 30
+
+        TextInput:
+            id: member_name_input
+            hint_text: "नाम"
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        Label:
+            text: "सम्पर्क नम्बर:"
+            size_hint_y: None
+            height: 30
+
+        TextInput:
+            id: contact_no_input
+            hint_text: "सम्पर्क नम्बर (वैकल्पिक)"
+            multiline: False
+            size_hint_y: None
+            height: 40
+            
+        BoxLayout:
+            size_hint_y: None
+            height: 50
+            spacing: 10
+
+            Button:
+                text: "रद्द गर्नुहोस्"
+                on_release: root.dismiss()
+
+            Button:
+                text: "थप्नुहोस्"
+                on_release: root.submit_member()

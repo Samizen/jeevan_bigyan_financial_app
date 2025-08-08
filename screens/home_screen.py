@@ -5,6 +5,7 @@ import datetime
 import sqlite3
 from kivy.uix.label import Label
 from utils.date_utils import get_nepali_month_range_ad # Assuming this function is in a separate file
+from widgets.members_form import MembersFormPopup
 from widgets.transactions_form import TransactionFormPopup
 
 
@@ -100,35 +101,18 @@ class HomeScreen(Screen):
         balance = prev_balance + (income - expense)
         return balance
     
+    def on_transaction_submitted(self):
+        self.load_transactions()
+        self.refresh_balances()
+
     def open_add_income_form(self):
-        popup = TransactionFormPopup(default_type="income", on_submit_callback=self.add_transaction_to_db)
+        popup = TransactionFormPopup(default_type="income", on_submit_callback=self.on_transaction_submitted)
         popup.open()
 
     def open_add_expense_form(self):
-        popup = TransactionFormPopup(default_type="expense", on_submit_callback=self.add_transaction_to_db)
+        popup = TransactionFormPopup(default_type="expense", on_submit_callback=self.on_transaction_submitted)
         popup.open()
 
-    def add_transaction_to_db(self, data):
-        # data = {'type': 'income', 'amount': 1200, 'category': 'तलब', 'date': '2082-04-22', 'description': 'bonus'}
-        conn = sqlite3.connect('your_database.db')  # replace with your actual db path
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            INSERT INTO transactions (amount, category, nepali_date, description, transaction_type)
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            data["amount"],
-            data["category"],
-            data["date"],
-            data["description"],
-            data["type"]
-        ))
-
-        conn.commit()
-        conn.close()
-
-        # Refresh table and stats
-        self.load_transactions_for_selected_month()
 
     def calculate_net_income(self, nep_month_str):
         
@@ -166,24 +150,53 @@ class HomeScreen(Screen):
         
         return (income or 0.0), (expense or 0.0)
 
-    def load_transactions(self):
+    def load_transactions(self, filter_type='month'):
         transaction_list = self.ids.transaction_list
         transaction_list.clear_widgets()
 
-        start_date, end_date = get_nepali_month_range_ad(self.current_month_text)
-        
-
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        cursor.execute("""
+        
+        query = """
             SELECT t.amount, t.transaction_date, t.description,
                     m.name AS member_name, c.name AS category_name, c.type
             FROM Transactions t
             LEFT JOIN Member m ON t.member_id = m.id
             LEFT JOIN Category c ON t.category_id = c.id
-            WHERE date(t.transaction_date) BETWEEN date(?) AND date(?)
-            ORDER BY t.transaction_date DESC
-        """, (start_date, end_date))
+        """
+        params = []
+        
+        # We build the WHERE clause based on the filter type
+        where_clause = " WHERE "
+        # VVVV FIX: Keep today as a date object for calculation VVVV
+        today = datetime.date.today()
+        
+        if filter_type == 'today':
+            where_clause += "date(t.transaction_date) = ?"
+            params.append(today.isoformat())
+        elif filter_type == 'week':
+            today_weekday = today.weekday() # Monday is 0, Sunday is 6
+            start_of_week = today - datetime.timedelta(days=today_weekday)
+            end_of_week = start_of_week + datetime.timedelta(days=6)
+            where_clause += "date(t.transaction_date) BETWEEN date(?) AND date(?)"
+            params.append(start_of_week.isoformat())
+            params.append(end_of_week.isoformat())
+        elif filter_type == 'income':
+            where_clause += "c.type = 'Income'"
+        elif filter_type == 'expense':
+            where_clause += "c.type = 'Expense'"
+        else: # 'month' is the default
+            start_date, end_date = get_nepali_month_range_ad(self.current_month_text)
+            where_clause += "date(t.transaction_date) BETWEEN date(?) AND date(?)"
+            params.append(start_date)
+            params.append(end_date)
+            
+        # We always sort by date
+        order_clause = " ORDER BY t.transaction_date DESC"
+        
+        final_query = query + where_clause + order_clause
+        
+        cursor.execute(final_query, tuple(params))
         transactions = cursor.fetchall()
         conn.close()
 
@@ -193,7 +206,7 @@ class HomeScreen(Screen):
         
         for tx in transactions:
             amount, tx_date, description, member_name, category_name, tx_type = tx
-            color = (0.2, 0.7, 0.2, 1) if tx_type == 'income' else (0.7, 0.2, 0.2, 1)
+            color = (0.2, 0.7, 0.2, 1) if tx_type == 'Income' else (0.7, 0.2, 0.2, 1)
             tx_text = f"{member_name} | {category_name} | {description} | रु {amount} | {tx_date}"
             label = Label(text=tx_text, font_size=16, size_hint_y=None, height=40, color=color)
             transaction_list.add_widget(label)
@@ -223,7 +236,11 @@ class HomeScreen(Screen):
         print("Open expense form overlay")
 
     def open_add_member_form(self):
-        print("Open add member form overlay")
+        # VVVV ADD THIS LOGIC VVVV
+        popup = MembersFormPopup()
+        popup.open()
 
     def filter_transactions(self, filter_type):
-        print(f"Filter transactions by: {filter_type}")
+        self.current_filter = filter_type
+        self.load_transactions(filter_type)
+        print(f"Filter transactions by: {filter_type}")    

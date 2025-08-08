@@ -25,3 +25,24 @@ def get_nepali_month_range_ad(nepali_month_str):
     end_ad = end_nepali_date.to_datetime_date()
 
     return (str(start_ad), str(end_ad))
+
+
+def bs_to_ad_date(nepali_date_str):
+    """Converts a Nepali date string (YYYY-MM-DD) to a standard AD date string."""
+    try:
+        # VVVV CORRECTED LOGIC VVVV
+        # Parse the year, month, and day from the string
+        year, month, day = map(int, nepali_date_str.split('-'))
+        
+        # Create a nepali_datetime date object
+        nepali_date_obj = nep_date(year, month, day)
+        
+        # Convert it to a standard Python datetime.date object
+        ad_date = nepali_date_obj.to_datetime_date()
+        
+        # Return the formatted AD date string
+        return ad_date.strftime('%Y-%m-%d')
+    except (ValueError, TypeError) as e:
+        # This will catch errors if the string format is incorrect
+        print(f"Error converting Nepali date '{nepali_date_str}': {e}")
+        return None
