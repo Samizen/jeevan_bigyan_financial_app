@@ -1,0 +1,29 @@
+[33mcommit 1d4f05d7bc9f448b49995dc6d056b7eebd7032e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mfeature/month-switcher[m[33m)[m
+Author: Samit <samitpdl@gmail.com>
+Date:   Fri Aug 8 12:40:23 2025 +0545
+
+    Implement: Add members, add income/expense, transaction filters
+
+[33mcommit 4748e54f34d83353b549407942d566215e0ce81b[m[33m ([m[1;31morigin/feature/month-switcher[m[33m)[m
+Author: Samit <samitpdl@gmail.com>
+Date:   Thu Aug 7 20:17:06 2025 +0545
+
+    Home page - date change, income and expense display, transactions display
+
+[33mcommit 85a8795f6673fb1e590379520f70cf7bf61f1da6[m
+Author: Samit <samitpdl@gmail.com>
+Date:   Wed Aug 6 17:04:19 2025 +0545
+
+    Setup buttons for home screen
+
+[33mcommit bda546a88643b9bac598d9750423b6fcce4a79bf[m
+Author: Samit <samitpdl@gmail.com>
+Date:   Wed Aug 6 16:43:58 2025 +0545
+
+    File and folder structure ready
+
+[33mcommit d23d4775d1dd8bf640293aa0251293dbd6897fc2[m
+Author: Samit <samitpdl@gmail.com>
+Date:   Wed Aug 6 13:58:14 2025 +0545
+
+    Initial commit
