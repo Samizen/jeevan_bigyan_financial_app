@@ -10,8 +10,9 @@ Builder.load_file("widgets/members_form.kv")
 
 class MembersFormPopup(Popup):
 
-    def __init__(self, **kwargs):
+    def __init__(self, on_submit_callback=None, **kwargs):
         super().__init__(**kwargs)
+        self.on_submit_callback = on_submit_callback
 
     def submit_member(self):
         member_name = self.ids.member_name_input.text.strip()

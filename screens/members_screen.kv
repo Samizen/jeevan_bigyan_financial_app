@@ -1,0 +1,57 @@
+<MembersScreen>:
+    name: 'members_screen'
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+
+        # Header Section
+        Label:
+            text: "जीवन विज्ञान, गट्ठाघर शाखा\nअर्थ व्यवस्थापन"
+            font: 'Yantramanav.ttf'
+            font_size: '20sp'
+            size_hint_y: None
+            height: 60
+            halign: 'center'
+
+        # Add Member Button
+        Button:
+            text: "+ सदस्य थप्नुहोस्"
+            size_hint_y: None
+            height: 50
+            on_release: root.open_add_member_form()
+
+        # Search Input
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            spacing: 5
+            TextInput:
+                id: member_search
+                hint_text: "सदस्य खोज्नुहोस्"
+                multiline: False
+                on_text: root.load_members(self.text)
+            Image:
+                source: 'assets/search.png' # You might need to add a search icon
+                size_hint_x: None
+                width: 30
+
+        # Section Header for the list
+        Label:
+            text: "सदस्य सूची"
+            size_hint_y: None
+            height: 30
+            font_size: '18sp'
+            halign: 'left'
+            color: (1, 1, 1, 1) # White color for better visibility
+
+        # Scrollable list for members
+        ScrollView:
+            id: member_list_scroll
+            BoxLayout:
+                id: member_list
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 5
