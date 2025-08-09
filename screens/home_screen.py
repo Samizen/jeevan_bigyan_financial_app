@@ -16,10 +16,12 @@ from widgets.transaction_row import TransactionRow
 from utils.db import delete_transaction
 from widgets.nepali_calendar import NepaliCalendarPopup
 from widgets.edit_transaction_popup import EditTransactionPopup
+from kivy.lang import Builder
 
 
 DB_PATH = 'data/community_finance.db'
 
+Builder.load_file('widgets/transaction_row.kv')
 
 class HomeScreen(Screen):
     current_month_text = StringProperty()
@@ -158,13 +160,17 @@ class HomeScreen(Screen):
         
         return (income or 0.0), (expense or 0.0)
 
+
     def load_transactions(self, filter_type='month'):
+        # Store the current filter type so we can use it for refreshing the list
+        self.current_filter = filter_type
+
         transaction_list = self.ids.transaction_list
         transaction_list.clear_widgets()
-
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
+        # Start with the base query
         base_query = """
             SELECT t.id, t.amount, t.transaction_date, t.description,
                 m.name AS member_name, c.name AS category_name, c.type
@@ -177,8 +183,14 @@ class HomeScreen(Screen):
         params = []
         today = datetime.date.today()
 
+        # Always filter by the current month's date range
+        start_date, end_date = get_nepali_month_range_ad(self.current_month_text)
+        conditions.append("date(t.transaction_date) BETWEEN date(?) AND date(?)")
+        params.extend([start_date, end_date])
+        
+        # Add additional conditions based on the filter type
         if filter_type == 'today':
-            conditions.append("date(t.transaction_date) = ?")
+            conditions.append("date(t.transaction_date) = date(?)")
             params.append(today.isoformat())
         elif filter_type == 'week':
             start_of_week = today - datetime.timedelta(days=today.weekday())
@@ -189,11 +201,8 @@ class HomeScreen(Screen):
             conditions.append("c.type = 'Income'")
         elif filter_type == 'expense':
             conditions.append("c.type = 'Expense'")
-        else:  # month filter
-            start_date, end_date = get_nepali_month_range_ad(self.current_month_text)
-            conditions.append("date(t.transaction_date) BETWEEN date(?) AND date(?)")
-            params.extend([start_date.isoformat(), end_date.isoformat()] if hasattr(start_date, 'isoformat') else [start_date, end_date])
-
+        
+        # Combine all conditions and build the final query
         if conditions:
             base_query += " WHERE " + " AND ".join(conditions)
         base_query += " ORDER BY t.transaction_date DESC"
@@ -211,6 +220,8 @@ class HomeScreen(Screen):
         for tx_id, amount, tx_date, description, member_name, category_name, tx_type in transactions:
             color = (0.2, 0.7, 0.2, 1) if tx_type == 'Income' else (0.7, 0.2, 0.2, 1)
             tx_text = f"{member_name} | {category_name} | {description} | रु {amount} | {tx_date}"
+            
+            print(f"Generated text: {tx_text}")
 
             row = TransactionRow(
                 tx_id,
@@ -220,7 +231,6 @@ class HomeScreen(Screen):
                 self.delete_transaction
             )
             transaction_list.add_widget(row)
-
 
 
     def refresh_balances(self):
