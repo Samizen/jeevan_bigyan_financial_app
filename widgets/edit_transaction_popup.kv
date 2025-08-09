@@ -1,26 +1,89 @@
+# widgets/edit_transaction_popup.kv
+
 <EditTransactionPopup>:
     title: "Edit Transaction"
-    size_hint: 0.8, 0.7
+    size_hint: 0.8, 0.9
     auto_dismiss: False
+    
     BoxLayout:
         orientation: 'vertical'
         padding: 10
         spacing: 10
 
-        TextInput:
-            id: amount_input
-            hint_text: "Amount"
-            input_filter: 'float'
+        # GridLayout for the form fields
+        GridLayout:
+            cols: 2
+            spacing: 10
+            size_hint_y: None
+            height: self.minimum_height
 
-        TextInput:
-            id: description_input
-            hint_text: "Description"
+            Label:
+                text: "Member:"
+                halign: 'right'
+                valign: 'middle'
+                size_hint_x: None
+                width: 100
+            Spinner:
+                id: member_spinner
+                text: root.selected_member
+                values: root.member_names
+                size_hint_y: None
+                height: '40dp'
+                on_text: root.selected_member = self.text
 
+            Label:
+                text: "Category:"
+                halign: 'right'
+                valign: 'middle'
+            Spinner:
+                id: category_spinner
+                text: root.selected_category
+                values: root.category_names
+                size_hint_y: None
+                height: '40dp'
+                on_text: root.selected_category = self.text
+            
+            Label:
+                text: "Amount:"
+                halign: 'right'
+                valign: 'middle'
+            TextInput:
+                id: amount_input
+                hint_text: "रु"
+                input_filter: 'float'
+                size_hint_y: None
+                height: '40dp'
+            
+            Label:
+                text: "Description:"
+                halign: 'right'
+                valign: 'middle'
+            TextInput:
+                id: description_input
+                hint_text: "Description"
+                multiline: False
+                size_hint_y: None
+                height: '40dp'
+
+            Label:
+                text: "Date:"
+                halign: 'right'
+                valign: 'middle'
+            TextInput:
+                id: date_input
+                hint_text: "YYYY-MM-DD"
+                size_hint_y: None
+                height: '40dp'
+                multiline: False
+
+        # Spacer to push the buttons to the bottom
+        Widget:
+
+        # Save and Cancel buttons
         BoxLayout:
             size_hint_y: None
             height: '40dp'
             spacing: 10
-
             Button:
                 text: "Save"
                 on_release: root.save()
