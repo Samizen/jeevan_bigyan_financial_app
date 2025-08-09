@@ -94,3 +94,31 @@ def insert_member(name, contact_no, member_added_date):
     finally:
         conn.close()
 
+def update_transaction(transaction_id, amount, category_name, member_name, date, description):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    member_id = get_member_id(member_name)
+    category_id = get_category_id(category_name)
+
+    if member_id is None:
+        raise ValueError(f"Member '{member_name}' not found.")
+    if category_id is None:
+        raise ValueError(f"Category '{category_name}' not found.")
+
+    cursor.execute("""
+        UPDATE Transactions
+        SET member_id = ?, amount = ?, category_id = ?, description = ?, transaction_date = ?
+        WHERE id = ?
+    """, (member_id, amount, category_id, description, date, transaction_id))
+
+    conn.commit()
+    conn.close()
+
+
+def delete_transaction(transaction_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Transactions WHERE id = ?", (transaction_id,))
+    conn.commit()
+    conn.close()

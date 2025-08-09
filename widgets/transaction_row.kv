@@ -1,0 +1,42 @@
+# transaction_row.kv
+
+<TransactionRow>:
+    # Set a consistent height for each row to prevent vertical crowding.
+    size_hint_y: None
+    height: 50
+
+    # Add padding and spacing to create a clean, non-cramped layout.
+    padding: 10
+    spacing: 5
+
+    # Use a canvas to draw a background for each row, making them distinct.
+    canvas.before:
+        Color:
+            rgba: (0.2, 0.2, 0.2, 1)  # A solid background color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [5]
+
+    Label:
+        # The text generated in Python (tx_text) is linked here.
+        text: root.label.text
+        
+        # THIS IS THE KEY FIX FOR OVERLAPPING TEXT:
+        # It tells the Label to use its full available size and wrap the text.
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        
+        # The color from your Python code is linked here.
+        color: root.label.color
+        
+        size_hint_x: 0.9 # Allocate most of the row's width to the label
+
+    Button:
+        text: '...'
+        size_hint_x: 0.1 # Keep the button a small, consistent size
+        background_normal: ''
+        background_color: (0.4, 0.4, 0.4, 1)
+        
+        on_release: root.open_menu()

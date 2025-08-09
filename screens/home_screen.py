@@ -4,9 +4,17 @@ from nepali_datetime import date as nep_date
 import datetime
 import sqlite3
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+
+
 from utils.date_utils import get_nepali_month_range_ad # Assuming this function is in a separate file
 from widgets.members_form import MembersFormPopup
 from widgets.transactions_form import TransactionFormPopup
+from widgets.transaction_row import TransactionRow
+from utils.db import delete_transaction
+from widgets.nepali_calendar import NepaliCalendarPopup
 
 
 DB_PATH = 'data/community_finance.db'
@@ -34,7 +42,6 @@ class HomeScreen(Screen):
         conn.close()
 
         self.known_balances = {month: balance for month, balance in rows}
-
 
     def on_kv_post(self, base_widget):
         self.load_known_balances()
@@ -156,60 +163,64 @@ class HomeScreen(Screen):
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        
-        query = """
-            SELECT t.amount, t.transaction_date, t.description,
-                    m.name AS member_name, c.name AS category_name, c.type
+
+        base_query = """
+            SELECT t.id, t.amount, t.transaction_date, t.description,
+                m.name AS member_name, c.name AS category_name, c.type
             FROM Transactions t
             LEFT JOIN Member m ON t.member_id = m.id
             LEFT JOIN Category c ON t.category_id = c.id
         """
+
+        conditions = []
         params = []
-        
-        # We build the WHERE clause based on the filter type
-        where_clause = " WHERE "
-        # VVVV FIX: Keep today as a date object for calculation VVVV
         today = datetime.date.today()
-        
+
         if filter_type == 'today':
-            where_clause += "date(t.transaction_date) = ?"
+            conditions.append("date(t.transaction_date) = ?")
             params.append(today.isoformat())
         elif filter_type == 'week':
-            today_weekday = today.weekday() # Monday is 0, Sunday is 6
-            start_of_week = today - datetime.timedelta(days=today_weekday)
+            start_of_week = today - datetime.timedelta(days=today.weekday())
             end_of_week = start_of_week + datetime.timedelta(days=6)
-            where_clause += "date(t.transaction_date) BETWEEN date(?) AND date(?)"
-            params.append(start_of_week.isoformat())
-            params.append(end_of_week.isoformat())
+            conditions.append("date(t.transaction_date) BETWEEN date(?) AND date(?)")
+            params.extend([start_of_week.isoformat(), end_of_week.isoformat()])
         elif filter_type == 'income':
-            where_clause += "c.type = 'Income'"
+            conditions.append("c.type = 'Income'")
         elif filter_type == 'expense':
-            where_clause += "c.type = 'Expense'"
-        else: # 'month' is the default
+            conditions.append("c.type = 'Expense'")
+        else:  # month filter
             start_date, end_date = get_nepali_month_range_ad(self.current_month_text)
-            where_clause += "date(t.transaction_date) BETWEEN date(?) AND date(?)"
-            params.append(start_date)
-            params.append(end_date)
-            
-        # We always sort by date
-        order_clause = " ORDER BY t.transaction_date DESC"
-        
-        final_query = query + where_clause + order_clause
-        
-        cursor.execute(final_query, tuple(params))
+            conditions.append("date(t.transaction_date) BETWEEN date(?) AND date(?)")
+            params.extend([start_date.isoformat(), end_date.isoformat()] if hasattr(start_date, 'isoformat') else [start_date, end_date])
+
+        if conditions:
+            base_query += " WHERE " + " AND ".join(conditions)
+        base_query += " ORDER BY t.transaction_date DESC"
+
+        cursor.execute(base_query, tuple(params))
         transactions = cursor.fetchall()
         conn.close()
 
         if not transactions:
-            label = Label(text="कुनै कारोबार फेला परेन।", size_hint_y=None, height=40)
-            transaction_list.add_widget(label)
-        
-        for tx in transactions:
-            amount, tx_date, description, member_name, category_name, tx_type = tx
+            transaction_list.add_widget(Label(
+                text="कुनै कारोबार फेला परेन।", size_hint_y=None, height=40
+            ))
+            return
+
+        for tx_id, amount, tx_date, description, member_name, category_name, tx_type in transactions:
             color = (0.2, 0.7, 0.2, 1) if tx_type == 'Income' else (0.7, 0.2, 0.2, 1)
             tx_text = f"{member_name} | {category_name} | {description} | रु {amount} | {tx_date}"
-            label = Label(text=tx_text, font_size=16, size_hint_y=None, height=40, color=color)
-            transaction_list.add_widget(label)
+
+            row = TransactionRow(
+                tx_id,
+                tx_text,
+                color,
+                self.edit_transaction,
+                self.delete_transaction
+            )
+            transaction_list.add_widget(row)
+
+
 
     def refresh_balances(self):
         current_month_key = f"{self.nep_year:04d}-{self.nep_month:02d}"
@@ -227,13 +238,18 @@ class HomeScreen(Screen):
         self.expense_button_text = f"खर्च: रु {expense:.2f}"
 
     def open_calendar(self):
-        print("Open Nepali calendar picker overlay")
+        popup = NepaliCalendarPopup(
+            current_year=self.nep_year,
+            on_select_callback=self.on_calendar_select
+        )
+        popup.open()
 
-    def open_income_form(self):
-        print("Open income form overlay")
-
-    def open_expense_form(self):
-        print("Open expense form overlay")
+    def on_calendar_select(self, year, month):
+        self.nep_year = year
+        self.nep_month = month
+        self.update_current_month_text()
+        self.load_transactions()
+        self.refresh_balances()
 
     def open_add_member_form(self):
         # VVVV ADD THIS LOGIC VVVV
@@ -244,3 +260,43 @@ class HomeScreen(Screen):
         self.current_filter = filter_type
         self.load_transactions(filter_type)
         print(f"Filter transactions by: {filter_type}")    
+
+    def edit_transaction(self, tx_id):
+        # Create and open the new EditTransactionPopup
+        popup = EditTransactionPopup(
+            tx_id=tx_id,
+            on_save_callback=self.on_transaction_submitted
+        )
+        popup.open()
+
+
+
+    def confirm_delete(tx_id, on_confirm):
+        content = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        content.add_widget(Label(text="Are you sure you want to delete this transaction?"))
+
+        buttons = BoxLayout(spacing=10, size_hint_y=None, height=40)
+        btn_yes = Button(text="Yes")
+        btn_no = Button(text="No")
+        buttons.add_widget(btn_yes)
+        buttons.add_widget(btn_no)
+        content.add_widget(buttons)
+
+        popup = Popup(title="Confirm Delete", content=content, size_hint=(0.6, 0.4), auto_dismiss=False)
+
+        btn_yes.bind(on_release=lambda *args: (on_confirm(tx_id), popup.dismiss()))
+        btn_no.bind(on_release=popup.dismiss)
+
+        popup.open()
+
+
+    def delete_transaction(self, tx_id):
+        def on_confirm_delete(tx_id_inner):
+            # Actual deletion code
+            delete_transaction(tx_id_inner)
+            self.load_transactions(getattr(self, 'current_filter', 'month'))
+            self.refresh_balances()
+
+        self.confirm_delete(tx_id, on_confirm=on_confirm_delete)
+
+    

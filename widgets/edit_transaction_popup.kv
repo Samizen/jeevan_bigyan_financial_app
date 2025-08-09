@@ -1,0 +1,30 @@
+<EditTransactionPopup>:
+    title: "Edit Transaction"
+    size_hint: 0.8, 0.7
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+
+        TextInput:
+            id: amount_input
+            hint_text: "Amount"
+            input_filter: 'float'
+
+        TextInput:
+            id: description_input
+            hint_text: "Description"
+
+        BoxLayout:
+            size_hint_y: None
+            height: '40dp'
+            spacing: 10
+
+            Button:
+                text: "Save"
+                on_release: root.save()
+
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
