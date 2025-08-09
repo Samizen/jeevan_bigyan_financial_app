@@ -15,6 +15,7 @@ from widgets.transactions_form import TransactionFormPopup
 from widgets.transaction_row import TransactionRow
 from utils.db import delete_transaction
 from widgets.nepali_calendar import NepaliCalendarPopup
+from widgets.edit_transaction_popup import EditTransactionPopup
 
 
 DB_PATH = 'data/community_finance.db'
@@ -270,33 +271,27 @@ class HomeScreen(Screen):
         popup.open()
 
 
-
-    def confirm_delete(tx_id, on_confirm):
+    def confirm_delete(self, tx_id, on_confirm):
         content = BoxLayout(orientation='vertical', spacing=10, padding=10)
         content.add_widget(Label(text="Are you sure you want to delete this transaction?"))
-
         buttons = BoxLayout(spacing=10, size_hint_y=None, height=40)
         btn_yes = Button(text="Yes")
         btn_no = Button(text="No")
         buttons.add_widget(btn_yes)
         buttons.add_widget(btn_no)
         content.add_widget(buttons)
-
         popup = Popup(title="Confirm Delete", content=content, size_hint=(0.6, 0.4), auto_dismiss=False)
-
         btn_yes.bind(on_release=lambda *args: (on_confirm(tx_id), popup.dismiss()))
         btn_no.bind(on_release=popup.dismiss)
-
         popup.open()
 
 
     def delete_transaction(self, tx_id):
         def on_confirm_delete(tx_id_inner):
-            # Actual deletion code
             delete_transaction(tx_id_inner)
             self.load_transactions(getattr(self, 'current_filter', 'month'))
             self.refresh_balances()
-
+        # Now we can correctly call self.confirm_delete
         self.confirm_delete(tx_id, on_confirm=on_confirm_delete)
 
     

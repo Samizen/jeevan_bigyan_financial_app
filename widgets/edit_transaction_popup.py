@@ -1,6 +1,9 @@
 from kivy.uix.popup import Popup
 from kivy.properties import NumericProperty, ObjectProperty
 
+from kivy.lang import Builder
+Builder.load_file('widgets/edit_transaction_popup.kv')
+
 class EditTransactionPopup(Popup):
     tx_id = NumericProperty()
     on_save_callback = ObjectProperty(None)
