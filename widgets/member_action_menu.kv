@@ -1,0 +1,20 @@
+# widgets/member_action_menu.kv
+
+<MemberActionMenu>:
+    title: 'कार्यहरू' # Actions
+    size_hint: (None, None)
+    size: ('200dp', '150dp')
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        Button:
+            text: 'सम्पादन' # Edit
+            on_release:
+                root.on_edit_callback(root.member_id)
+                root.dismiss()
+        Button:
+            text: 'हटाउनुहोस्' # Delete
+            on_release:
+                root.on_delete_callback(root.member_id)
+                root.dismiss()

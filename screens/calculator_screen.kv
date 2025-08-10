@@ -1,0 +1,115 @@
+# screens/calculator_screen.kv
+
+<CalculatorScreen>:
+    name: 'calculator_screen'
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+        
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: 0.2
+            spacing: 5
+            padding: 5
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.2, 0.2, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                id: history_label
+                text: root.history_text
+                size_hint_y: 0.4
+                font_size: '24sp'
+                halign: 'right'
+                valign: 'bottom'
+                text_size: self.size
+                
+            Label:
+                id: display_label
+                text: root.display_text
+                size_hint_y: 0.6
+                font_size: '48sp'
+                halign: 'right'
+                valign: 'bottom'
+                text_size: self.size
+
+        GridLayout:
+            cols: 4
+            spacing: 10
+            size_hint_y: 0.8
+            
+            # Row 1
+            Button:
+                text: 'C'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '+/-'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '%'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '/'
+                on_release: root.on_button_press(self.text)
+            
+            # Row 2
+            Button:
+                text: '७'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '८'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '९'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '*'
+                on_release: root.on_button_press(self.text)
+
+            # Row 3
+            Button:
+                text: '४'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '५'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '६'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '-'
+                on_release: root.on_button_press(self.text)
+
+            # Row 4
+            Button:
+                text: '१'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '२'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '३'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '+'
+                on_release: root.on_button_press(self.text)
+
+            # Row 5
+            Button:
+                text: '.'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '०'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '⌫'
+                on_release: root.on_button_press(self.text)
+            Button:
+                text: '='
+                on_release: root.on_button_press(self.text)
+                background_color: 0.2, 0.6, 0.8, 1

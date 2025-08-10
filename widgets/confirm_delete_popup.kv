@@ -1,0 +1,31 @@
+# widgets/confirm_delete_popup.kv
+
+<ConfirmDeletePopup>:
+    title: 'पुष्टि गर्नुहोस्'  # Confirm
+    size_hint: (0.8, 0.4)
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+
+        Label:
+            text: root.message
+            text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
+
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            spacing: 10
+
+            Button:
+                text: 'रद्द गर्नुहोस्'  # Cancel
+                on_release: root.dismiss()
+
+            Button:
+                text: 'मेटाउनुहोस्'  # Delete
+                background_color: 0.8, 0.2, 0.2, 1
+                on_release: root.confirm_delete()

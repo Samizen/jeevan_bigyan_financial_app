@@ -5,6 +5,7 @@ from kivy.uix.label import Label
 
 from utils import db
 
+
 # Load the kv file for this widget
 Builder.load_file("widgets/members_form.kv")
 

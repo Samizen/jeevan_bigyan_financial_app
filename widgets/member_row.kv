@@ -1,0 +1,43 @@
+# widgets/member_row.kv
+
+<MemberRow>:
+    size_hint_y: None
+    height: 60
+    padding: 5
+    spacing: 10
+    
+    canvas.before:
+        Color:
+            rgba: 0.2, 0.2, 0.2, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+
+    # Content container (Name and Contact Number)
+    BoxLayout:
+        orientation: 'horizontal'
+        padding: 5
+        spacing: 10
+        size_hint_x: 0.8
+        Label:
+            text: root.member_name
+            font_size: '18sp'
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+            size_hint_x: 0.5
+        Label:
+            text: root.contact_no
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+            size_hint_x: 0.5
+        
+    # Actions
+    BoxLayout:
+        size_hint_x: 0.2
+        width: 40
+        Button:
+            text: '...'
+            on_release: root.open_actions_menu()
